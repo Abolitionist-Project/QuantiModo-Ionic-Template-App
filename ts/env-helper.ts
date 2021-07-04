@@ -29,6 +29,7 @@ export let paths = {
     chcpLogin: ".chcplogin",
     sass: ["./src/scss/**/*.scss"],
     src: {
+        buildInfo: "src/data/build-info.json",
         defaultPrivateConfig: "src/default.private_config.json",
         devCredentials: "src/dev-credentials.json",
         firebase: "src/lib/firebase/**/*",

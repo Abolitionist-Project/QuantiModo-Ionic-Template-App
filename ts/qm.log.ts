@@ -161,3 +161,12 @@ export function logErrorAndThrowException(message: string, object?: any) {
     error(message, object)
     throw message
 }
+
+export function le(message: string, object?: any) {
+    error(message, object)
+    throw message
+}
+
+export function missingRequiredParameter(paramName: string, funcName: string) {
+    le("Please provide "+paramName+" to "+funcName)
+}

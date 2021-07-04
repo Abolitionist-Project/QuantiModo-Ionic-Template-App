@@ -1,11 +1,20 @@
-/* eslint-disable no-process-env */
-try {
-    var dotenv = require('dotenv')
-    dotenv.config({path: './secrets/.env'});
+/* eslint-disable no-process-env,object-shorthand,semi,block-spacing,comma-dangle,one-var,space-infix-ops,no-unused-vars,no-multi-spaces,no-useless-concat,no-empty */
+const {missingRequiredParameter}  = require("./ts/qm.log");
+const {readJsonFile}  = require("./ts/qm.file-helper");
+const {loadEnv} = require("./ts/env-helper");
+const {envs} = require("./ts/env-helper");
+const {paths} = require("./ts/env-helper");
+const {qmPlatform} = require("./ts/env-helper");
+const {getenvOrException} = require("./ts/env-helper");
+var qmLog = require("./ts/qm.log");
+var pump = require('pump');
+const {getQMClientIdOrException} = require("./ts/env-helper");
+try{
+    loadEnv(".env")
 } catch (e) {
-    console.error(e);
+    qmLog.info(e.message);
 }
-var QUANTIMODO_CLIENT_ID = process.env.QUANTIMODO_CLIENT_ID || process.env.CLIENT_ID;
+var QUANTIMODO_CLIENT_ID = getQMClientIdOrException()
 var devCredentials;
 var androidArm7DebugApkName = 'android-armv7-debug';
 var androidX86DebugApkName = 'android-x86-debug';
@@ -19,66 +28,6 @@ function isTruthy(value) {return (value && value !== "false");}
 var buildPath = 'build';
 var circleCIPathToRepo = '~/quantimodo-android-chrome-ios-web-app';
 var chromeExtensionBuildPath = buildPath + '/chrome_extension';
-var qmPlatform = {
-    buildingFor: {
-        getPlatformBuildingFor: function(){
-            if(qmPlatform.buildingFor.android()){return 'android';}
-            if(qmPlatform.buildingFor.ios()){return 'ios';}
-            if(qmPlatform.buildingFor.chrome()){return 'chrome';}
-            if(qmPlatform.buildingFor.web()){return 'web';}
-            qmLog.error("What platform are we building for?");
-            return null;
-        },
-        setChrome: function(){
-            qmPlatform.buildingFor.platform = qmPlatform.chrome;
-        },
-        platform: null,
-        web: function () {
-            return !qmPlatform.buildingFor.android() && !qmPlatform.buildingFor.ios() && !qmPlatform.buildingFor.chrome();
-        },
-        android: function () {
-            if (qmPlatform.buildingFor.platform === 'android'){ return true; }
-            if (process.env.BUDDYBUILD_SECURE_FILES) { return true; }
-            if (process.env.TRAVIS_OS_NAME === "osx") { return false; }
-            return process.env.BUILD_ANDROID;
-        },
-        ios: function () {
-            if (qmPlatform.buildingFor.platform === qmPlatform.ios){ return true; }
-            if (process.env.BUDDYBUILD_SCHEME) {return true;}
-            if (process.env.TRAVIS_OS_NAME === "osx") { return true; }
-            return process.env.BUILD_IOS;
-        },
-        chrome: function () {
-            if (qmPlatform.buildingFor.platform === qmPlatform.chrome){ return true; }
-            return process.env.BUILD_CHROME;
-        },
-        mobile: function () {
-            return qmPlatform.buildingFor.android() || qmPlatform.buildingFor.ios();
-        }
-    },
-    setBuildingFor: function(platform){
-        qmPlatform.buildingFor.platform = platform;
-    },
-    isOSX: function(){
-        return process.platform === 'darwin';
-    },
-    isLinux: function(){
-        return process.platform === 'linux';
-    },
-    isWindows: function(){
-        return !qmPlatform.isOSX() && !qmPlatform.isLinux();
-    },
-    getPlatform: function(){
-        if(qmPlatform.buildingFor){return qmPlatform.buildingFor;}
-        if(qmPlatform.isOSX()){return qmPlatform.ios;}
-        if(qmPlatform.isWindows()){return qmPlatform.android;}
-        return qmPlatform.web;
-    },
-    ios: 'ios',
-    android: 'android',
-    web: 'web',
-    chrome: 'chrome'
-};
 // Setup platforms to build that are supported on current hardware
 // See https://taco.visualstudio.com/en-us/docs/tutorial-gulp-readme/
 //var winPlatforms = ["android", "windows"], //Android is having problems so I'm only building windows for now
@@ -117,36 +66,6 @@ var appIds = {
     'quantimodo': true,
     'medimodo': true
 };
-var paths = {
-    apk: {//android\app\build\outputs\apk\release\app-release.apk
-        combinedRelease: "platforms/android/app/build/outputs/apk/release/app-release.apk",
-        combinedDebug: "platforms/android/app/build/outputs/apk/release/app-debug.apk",
-        arm7Release: "platforms/android/app/build/outputs/apk/release/app-arm7-release.apk",
-        x86Release: "platforms/android/app/build/outputs/apk/release/app-x86-release.apk",
-        outputFolder: "platforms/android/app/build/outputs/apk",
-        builtApk: null,
-    },
-    sass: ['./src/scss/**/*.scss'],
-    src:{
-        devCredentials: "src/dev-credentials.json",
-        defaultPrivateConfig: "src/default.private_config.json",
-        icons: "src/img/icons",
-        firebase: "src/lib/firebase/**/*",
-        js: "src/js/*.js",
-        serviceWorker: "src/firebase-messaging-sw.js",
-        staticData: 'src/data/qmStaticData.js',
-    },
-    www: {
-        devCredentials: "www/dev-credentials.json",
-        defaultPrivateConfig: "www/default.private_config.json",
-        icons: "www/img/icons",
-        firebase: "www/lib/firebase/",
-        js: "www/js/",
-        scripts: "www/scripts",
-        staticData: 'src/data/qmStaticData.js',
-    },
-    chcpLogin: '.chcplogin',
-};
 var argv = require('yargs').argv;
 var defaultRequestOptions = {strictSSL: false};
 var fs = require('fs');
@@ -157,120 +76,6 @@ var runSequence = require('run-sequence');
 var AWS_ACCESS_KEY_ID = process.env.QM_AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID; // Netlify has their own
 var AWS_SECRET_ACCESS_KEY = process.env.QM_AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY; // Netlify has their own
 var s3Options = {accessKeyId: AWS_ACCESS_KEY_ID, secretAccessKey: AWS_SECRET_ACCESS_KEY};
-var qmLog = {
-    error: function (message, metaData, maxCharacters) {
-        metaData = qmLog.addMetaData(metaData);
-        console.error(qmLog.obfuscateStringify(message, metaData, maxCharacters));
-        metaData.build_info = qmGulp.buildInfoHelper.getCurrentBuildInfo();
-        bugsnag.notify(new Error(qmLog.obfuscateStringify(message), qmLog.obfuscateSecrets(metaData)));
-    },
-    info: function (message, object, maxCharacters) {
-        if(typeof message !== "string"){
-            object = message;
-            message = null;
-        }
-        console.log(qmLog.obfuscateStringify(message, object, maxCharacters));
-    },
-    debug: function (message, object, maxCharacters) {
-        if(isTruthy(process.env.BUILD_DEBUG || process.env.DEBUG_BUILD)){
-            qmLog.info("DEBUG: " + message, object, maxCharacters);
-        }
-    },
-    logErrorAndThrowException: function (message, object) {
-        qmLog.error(message, object);
-        throw message;
-    },
-    addMetaData: function(metaData){
-        metaData = metaData || {};
-        metaData.environment = qmLog.obfuscateSecrets(process.env);
-        metaData.subsystem = { name: qmLog.getCurrentServerContext() };
-        metaData.client_id = QUANTIMODO_CLIENT_ID;
-        metaData.build_link = qmGulp.buildInfoHelper.getBuildLink();
-        return metaData;
-    },
-    obfuscateStringify: function(message, object, maxCharacters) {
-        if(maxCharacters !== false){maxCharacters = maxCharacters || 140;}
-        var objectString = '';
-        if(object){
-            object = qmLog.obfuscateSecrets(object);
-            objectString = ':  ' + qmLog.prettyJSONStringify(object);
-        }
-        if (maxCharacters !== false && objectString.length > maxCharacters) {objectString = objectString.substring(0, maxCharacters) + '...';}
-        message += objectString;
-        if(process.env.QUANTIMODO_CLIENT_SECRET){message = message.replace(process.env.QUANTIMODO_CLIENT_SECRET, 'HIDDEN');}
-        if(AWS_SECRET_ACCESS_KEY){message = message.replace(AWS_SECRET_ACCESS_KEY, 'HIDDEN');}
-        if(process.env.ENCRYPTION_SECRET){message = message.replace(process.env.ENCRYPTION_SECRET, 'HIDDEN');}
-        if(process.env.QUANTIMODO_ACCESS_TOKEN){message = message.replace(process.env.QUANTIMODO_ACCESS_TOKEN, 'HIDDEN');}
-        message = qmLog.obfuscateString(message);
-        return message;
-    },
-    isSecretWord: function(propertyName){
-        var lowerCaseProperty = propertyName.toLowerCase();
-        return lowerCaseProperty.indexOf('secret') !== -1 ||
-            lowerCaseProperty.indexOf('password') !== -1 ||
-            lowerCaseProperty.indexOf('key') !== -1 ||
-            lowerCaseProperty.indexOf('database') !== -1 ||
-            lowerCaseProperty.indexOf('token') !== -1;
-    },
-    obfuscateString: function(string){
-        var env = process.env;
-        for (var propertyName in env) {
-            if (env.hasOwnProperty(propertyName)) {
-                if(qmLog.isSecretWord(propertyName)){
-                    string = string.replace(env[propertyName], '[SECURE]');
-                }
-            }
-        }
-        return string;
-    },
-    obfuscateSecrets: function(object){
-        if(typeof object !== 'object'){return object;}
-        object = JSON.parse(JSON.stringify(object)); // Decouple so we don't screw up original object
-        for (var propertyName in object) {
-            if (object.hasOwnProperty(propertyName)) {
-                if(qmLog.isSecretWord(propertyName)){
-                    object[propertyName] = "[SECURE]";
-                } else {
-                    object[propertyName] = qmLog.obfuscateSecrets(object[propertyName]);
-                }
-            }
-        }
-        return object;
-    },
-    getCurrentServerContext: function() {
-        if(process.env.CIRCLE_BRANCH){return "circleci";}
-        if(process.env.BUDDYBUILD_BRANCH){return "buddybuild";}
-        return process.env.HOSTNAME;
-    },
-    prettyJSONStringify: function(object) {return JSON.stringify(object, null, '\t');},
-    slugify: function(str){
-        str = str.replace(/^\s+|\s+$/g, ''); // trim
-        str = str.toLowerCase();
-        // remove accents, swap ñ for n, etc
-        var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-        var to   = "aaaaeeeeiiiioooouuuunc------";
-        for (var i=0, l=from.length ; i<l ; i++)
-        {
-            str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-        }
-        str = str.replace('.', '-') // replace a dot by a dash
-            .replace(/[^a-z0-9 -]/g, '') // remove invalid chars
-            .replace(/\s+/g, '-') // collapse whitespace and replace by a dash
-            .replace(/-+/g, '-'); // collapse dashes
-        return str;
-    }
-};
-var bugsnag = require("bugsnag");
-bugsnag.register("ae7bc49d1285848342342bb5c321a2cf");
-bugsnag.releaseStage = qmLog.getCurrentServerContext();
-process.on('unhandledRejection', function (err) {
-    console.error("Unhandled rejection: " + (err && err.stack || err));
-    bugsnag.notify(err);
-});
-bugsnag.onBeforeNotify(function (notification) {
-    var metaData = notification.events[0].metaData;
-    metaData = qmLog.addMetaData(metaData);
-});
 var qmGit = {
     branchName: null,
     getBranchName: function(){
@@ -559,7 +364,7 @@ var qmGulp = {
             return qmGulp.buildInfoHelper.currentBuildInfo;
         },
         getPreviousBuildInfo: function () {
-            var previousBuildInfo = readFile(paths.src.buildInfo);
+            var previousBuildInfo = readJsonFile(paths.src.buildInfo);
             if(!previousBuildInfo){
                 qmLog.info("No previous BuildInfo file at "+paths.src.buildInfo);
                 qmGulp.buildInfoHelper.previousBuildInfo = false;
@@ -747,7 +552,7 @@ var qmGulp = {
     }
 };
 qmGulp.buildInfoHelper.setVersionNumbers();
-var Quantimodo = require('quantimodo');
+var Quantimodo = require('./plain-javascript-client/index.js');
 /** @namespace Quantimodo.ApiClient */
 var defaultClient = Quantimodo.ApiClient.instance;
 var quantimodo_oauth2 = defaultClient.authentications.quantimodo_oauth2;
@@ -796,21 +601,14 @@ function getPathToChromeExtensionZip() {return buildPath + '/' + getChromeExtens
 function getPathToUnzippedChromeExtension() {return buildPath + '/' + QUANTIMODO_CLIENT_ID + '-chrome-extension';}
 function readDevCredentials(){
     try{
-        devCredentials = JSON.parse(fs.readFileSync(paths.src.devCredentials));
+        devCredentials = readJsonFile(paths.src.devCredentials);
         qmLog.info("Using dev credentials from " + paths.src.devCredentials + ". This file is ignored in .gitignore and should never be committed to any repository.");
     } catch (error){
         qmLog.debug('No existing dev credentials found');
         devCredentials = {};
     }
 }
-function readFile(path){
-    try {
-        return JSON.parse(fs.readFileSync(path));
-    } catch (e) {
-        qmLog.error("Could not read "+path);
-        return false;
-    }
-}
+
 function outputFileContents(path){
     qmLog.info(path+": "+fs.readFileSync(path));
 }

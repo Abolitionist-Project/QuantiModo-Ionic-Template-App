@@ -20,7 +20,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var qmTests = __importStar(require("./cypress-functions"));
-// loadEnv("local")
+var env_helper_1 = require("./env-helper");
+env_helper_1.loadEnv("local");
 if (!process.env.ELECTRON_ENABLE_LOGGING) {
     console.log("set env ELECTRON_ENABLE_LOGGING=\"1\" if you want to log to CI.  Disabled by default to avoid leaking secrets on Travis");
 }

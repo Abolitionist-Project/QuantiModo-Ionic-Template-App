@@ -8,6 +8,7 @@ import * as Q from "q"
 import rimraf from "rimraf"
 import {envs, getenvOrException} from "./env-helper"
 import * as qmLog from "./qm.log"
+import {missingRequiredParameter} from "./qm.log"
 const defaultS3Bucket = "qmimages"
 // tslint:disable-next-line:no-var-requires
 const appRoot = require("app-root-path")
@@ -236,4 +237,14 @@ export function listFilesRecursively(dir: string) {
         })()
     })
     return deferred.promise
+}
+
+export function readJsonFile(jsonPath: string ) {
+    try {
+        const content = fs.readFileSync(jsonPath).toString()
+        return JSON.parse(content)
+    } catch (e) {
+        qmLog.error("Could not read "+jsonPath)
+        return false
+    }
 }

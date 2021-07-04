@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logErrorAndThrowException = exports.slugify = exports.throwError = exports.getCurrentServerContext = exports.logBugsnagLink = exports.prettyJSONStringify = exports.obfuscateSecrets = exports.obfuscateString = exports.isSecretWord = exports.obfuscateStringify = exports.addMetaData = exports.debug = exports.info = exports.error = void 0;
+exports.missingRequiredParameter = exports.le = exports.logErrorAndThrowException = exports.slugify = exports.throwError = exports.getCurrentServerContext = exports.logBugsnagLink = exports.prettyJSONStringify = exports.obfuscateSecrets = exports.obfuscateString = exports.isSecretWord = exports.obfuscateStringify = exports.addMetaData = exports.debug = exports.info = exports.error = void 0;
 var js_1 = __importDefault(require("@bugsnag/js"));
 // @ts-ignore
 var qmHelpers_js_1 = __importDefault(require("../src/js/qmHelpers.js"));
@@ -166,4 +166,13 @@ function logErrorAndThrowException(message, object) {
     throw message;
 }
 exports.logErrorAndThrowException = logErrorAndThrowException;
+function le(message, object) {
+    error(message, object);
+    throw message;
+}
+exports.le = le;
+function missingRequiredParameter(paramName, funcName) {
+    le("Please provide " + paramName + " to " + funcName);
+}
+exports.missingRequiredParameter = missingRequiredParameter;
 //# sourceMappingURL=qm.log.js.map

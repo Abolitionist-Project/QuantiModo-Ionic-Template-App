@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listFilesRecursively = exports.uploadFolderToS3 = exports.download = exports.getAbsolutePath = exports.writeToFile = exports.uploadToS3 = exports.uploadToS3InSubFolderWithCurrentDateTime = exports.downloadFromS3 = exports.getS3Client = exports.deleteFile = exports.createFile = exports.exists = exports.assertExists = exports.assertDoesNotExist = void 0;
+exports.readJsonFile = exports.listFilesRecursively = exports.uploadFolderToS3 = exports.download = exports.getAbsolutePath = exports.writeToFile = exports.uploadToS3 = exports.uploadToS3InSubFolderWithCurrentDateTime = exports.downloadFromS3 = exports.getS3Client = exports.deleteFile = exports.createFile = exports.exists = exports.assertExists = exports.assertDoesNotExist = void 0;
 // noinspection JSUnusedGlobalSymbols,JSUnusedGlobalSymbols
 var aws_sdk_1 = __importDefault(require("aws-sdk"));
 var fs = __importStar(require("fs"));
@@ -257,4 +257,15 @@ function listFilesRecursively(dir) {
     return deferred.promise;
 }
 exports.listFilesRecursively = listFilesRecursively;
+function readJsonFile(jsonPath) {
+    try {
+        var content = fs.readFileSync(jsonPath).toString();
+        return JSON.parse(content);
+    }
+    catch (e) {
+        qmLog.error("Could not read " + jsonPath);
+        return false;
+    }
+}
+exports.readJsonFile = readJsonFile;
 //# sourceMappingURL=qm.file-helper.js.map
