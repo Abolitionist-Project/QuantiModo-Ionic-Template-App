@@ -239,7 +239,7 @@ md-dialog.dtp {
 .dtp .dtp-picker-time > a {
     display: block;
     line-height: 23px;
-    padding: 3px;
+    padding: 3px 3px 3px 3px;
 }
 
 .dtp .dtp-picker-time {
@@ -267,7 +267,7 @@ md-dialog.dtp {
 }
 
 .dtp div.dtp-picker-clock {
-    margin: 10px 20px 0;
+    margin: 10px 20px 0 20px;
     padding: 10px;
     border-radius: 50% !important;
     background: #eee;
