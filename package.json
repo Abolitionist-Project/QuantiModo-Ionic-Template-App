@@ -5,7 +5,7 @@
     "url": "https://github.com/QuantiModo/quantimodo-android-chrome-ios-web-app.git"
   },
   "engines": {
-    "node": "10"
+    "node": "12.x"
   },
   "version": "1.0.0",
   "description": "Perfect your life!",
