@@ -133,6 +133,7 @@ angular.module('starter').controller('MeasurementAddCtrl', [
             delete m.startTimeEpoch;
             delete m.startTimeString;
             m.variableCategoryName = getVariableCategoryName();
+            qm.measurements.processMeasurement(m)
             return m;
         }
         function showToast() {
@@ -153,7 +154,9 @@ angular.module('starter').controller('MeasurementAddCtrl', [
                 JSON.stringify(m));
             showToast();
             // Measurement only - post measurement. This is for adding or editing
-            var backStateParams = {};
+            var backStateParams = {
+                measurement: m,
+            };
             function handleUnitChange(){
                 qmLog.error("Syncing reminders because unit changed");
                 qm.storage.removeItem(qm.items.trackingReminders);
