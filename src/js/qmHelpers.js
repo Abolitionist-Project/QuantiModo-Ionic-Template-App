@@ -11874,7 +11874,7 @@ var qm = {
             var deferred = Q.defer();
             params = params || {};
             var search = params.searchPhrase;
-            var min = params.minimumNumberOfResultsRequiredToAvoidAPIRequest;
+            var min = params.minimumNumberOfResultsRequiredToAvoidAPIRequest || 20;
             if(!search || search === ""){min = 20;}
             if(search && search.length > 8){min = 4;}
             if(search && search.length > 12){min = 2;}
@@ -11924,9 +11924,9 @@ var qm = {
                         if(localCount){
                             qmLog.debug("Returning " + localCount + " local variables that match");
                             sortUpdateSubtitlesAndReturnVariables(localVariables, params); // Return the local ones we found
+                            deferred.resolve(localVariables);
                             if(localCount >= min){
                                 qmLog.debug("No need for API request because we have more than " + min);
-                                deferred.resolve(localVariables);
                                 return;
                             }
                             qmLog.debug("Searching api as well because we don't have more than " + min);
