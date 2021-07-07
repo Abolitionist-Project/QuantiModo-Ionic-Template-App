@@ -1,0 +1,9 @@
+<div id="aboveAverageWords"
+     ng-if="words && state.numberOfDisplayedNotifications === 0">
+    <word-cloud words="words.aboveAverageWords" width="width" height="height" padding="10"
+                on-click="wordClicked"></word-cloud>
+</div>
+<div id="belowAverageWords" ng-if="words">
+    <word-cloud words="words.belowAverageWords" width="width" height="height" padding="10"
+                on-click="wordClicked"></word-cloud>
+</div>

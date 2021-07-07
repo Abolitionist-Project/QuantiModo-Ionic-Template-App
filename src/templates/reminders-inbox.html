@@ -3,15 +3,6 @@
     <ion-content scroll="true" overflow-scroll="true">
         <!--<ion-content style="background-color: #f2f2f2" ng-class="{ isBrowserView : platform.isWeb == true } "> This breaks pull down to refresh in browser-->
         <ion-refresher on-refresh="syncNotifications({noCache: true})"></ion-refresher>
-        <div id="aboveAverageWords"
-             ng-if="words && state.numberOfDisplayedNotifications === 0">
-            <word-cloud words="words.aboveAverageWords" width="width" height="height" padding="10"
-                        on-click="wordClicked"></word-cloud>
-        </div>
-        <div id="belowAverageWords" ng-if="words">
-            <word-cloud words="words.belowAverageWords" width="width" height="height" padding="10"
-                        on-click="wordClicked"></word-cloud>
-        </div>
         <div ng-if="stateParams.showHelpCards === true && defaultHelpCards && defaultHelpCards[0]">
             <div ng-repeat="helpCard in defaultHelpCards | limitTo:1">
                 <div ng-include="'templates/fragments/help-info-card-fragment.html'"></div>
@@ -37,7 +28,7 @@
                      class="item item-divider">
                     {{divider.name}}
                     <a style="float: right; margin: 5px; cursor: pointer;"
-                       ng-click="syncNotifications({noCache: true})">
+                       ng-click="syncNotifications({noCache: true}, 'button clicked')">
                         <i class="icon ion-refresh">&nbsp;Refresh</i>
                     </a>
                 </div>
@@ -52,53 +43,72 @@
                 </div>
             </div>
         </div>
+        <div id="allCaughtUpCard2"
+            ng-if="!state.loading && state.numberOfDisplayedNotifications === 0"
+            ng-repeat="helpCard in [state.caughtUpCard] | limitTo:1">
+            <div ng-include="'templates/fragments/help-info-card-fragment.html'"></div>
+        </div>
         <div id="allCaughtUpCard"
              class="list card"
              ng-if="!state.loading && state.numberOfDisplayedNotifications === 0">
             <div class="item" style="padding-bottom:10px;">
-                <p style=" text-align: center; line-height: normal; font-size: 25px;">All caught up!</p>
+                <p style=" text-align: center; line-height: normal; font-size: 25px;">
+                    All caught up!
+                </p>
                 <div class="row">
-                    <div class="col" style="padding-top: 0px;"><i style="text-align: center; font-size: 60px;"
-                                                                  class="icon positive ion-android-sunny"></i></div>
-                    <div class="col col-75"><h2 style="white-space: normal; text-align: justify; line-height: normal; ">
-                        Maybe you should refresh or add some more reminders? </h2></div>
+                    <div class="col" style="padding-top: 0px;">
+                        <i style="text-align: center; font-size: 60px;" class="icon positive ion-android-sunny">
+                        </i>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="button-bar">
-                        <button class="button button-clear button-balanced" style="font-size: 14px;"
-                                ng-click="goToState('app.reminderSearch')"><i class="ion-android-notifications"> &nbsp;
-                            Add a reminder &nbsp;</i></button>
+                        <button class="text-pink-500 bg-transparent border border-solid border-pink-500 hover:bg-pink-500 hover:text-white active:bg-pink-600 font-bold uppercase px-8 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                style="font-size: 14px;"
+                                ng-click="goToState('app.reminderSearch')">
+                            <i class="ion-android-notifications"> &nbsp;
+                            Add a reminder &nbsp;
+                            </i>
+                        </button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="button-bar">
                         <button class="button button-clear button-royal" style="font-size: 14px;"
-                                ng-click="goToState('app.measurementAddSearch')"><i class="ion-compose"> &nbsp; Record a
-                            measurement &nbsp;</i></button>
+                                ng-click="goToState('app.measurementAddSearch')">
+                            <i class="ion-compose">
+                                &nbsp; Record a
+                            measurement &nbsp;
+                            </i>
+                        </button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="button-bar">
                         <button class="button button-clear button-calm" style="font-size: 14px;"
-                                ng-click="goToState('app.historyAll')"><i class="ion-ios-list-outline"> &nbsp; History
-                            &nbsp;</i></button>
+                                ng-click="goToState('app.historyAll')">
+                            <i class="ion-ios-list-outline">
+                                &nbsp; History
+                            &nbsp;</i>
+                        </button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="button-bar">
-                        <button class="button button-clear button-balanced" style="font-size: 14px;"
-                                ng-click="syncNotifications({noCache: true})"><i class="ion-refresh"> &nbsp; Refresh
-                            &nbsp;</i></button>
+                        <button class="button button-clear button-balanced"
+                                style="font-size: 14px;"
+                                ng-click="syncNotifications({noCache: true}, 'button clicked')">
+                            <i class="ion-refresh">
+                                &nbsp; Refresh
+                            &nbsp;</i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="Favorites"
-            class="list card"
-             ng-if="state.favoritesArray && state.favoritesArray.length && state.numberOfDisplayedNotifications === 0">
-            <div class="item item-divider" style="">{{state.favoritesTitle}}</div>
-            <div ng-include="'templates/fragments/blood-pressure-favorite-fragment.html'"></div>
-            <div ng-include="'templates/fragments/favorites-list-fragment.html'"></div>
+        <div id="word-cloud"
+             ng-if="words && state.numberOfDisplayedNotifications === 0"
+              ng-include="'templates/word-cloud.html'">
         </div>
         <div id="studies-container"
              ng-if="state.studiesResponse.studies && state.studiesResponse.studies.length && state.numberOfDisplayedNotifications === 0"
@@ -106,9 +116,18 @@
             <div ng-include="'templates/fragments/studies-list-fragment.html'"></div>
             <div class="button-bar">
                 <a class="button button-clear button-positive" ng-click="goToState('app.predictorSearch')"
-                   style="text-overflow: clip;"><i class="ion-search"> More Discoveries</i></a>
+                   style="text-overflow: clip;">
+                    <i class="ion-search"> More Discoveries</i>
+                </a>
             </div>
             <br>
+        </div>
+        <div id="Favorites"
+             class="list card"
+             ng-if="state.favoritesArray && state.favoritesArray.length && state.numberOfDisplayedNotifications === 0">
+            <div class="item item-divider" style="">{{state.favoritesTitle}}</div>
+            <div ng-include="'templates/fragments/blood-pressure-favorite-fragment.html'"></div>
+            <div ng-include="'templates/fragments/favorites-list-fragment.html'"></div>
         </div>
         <div id="charts-container"
              ng-if="state.variableObject.charts && state.numberOfDisplayedNotifications === 0"

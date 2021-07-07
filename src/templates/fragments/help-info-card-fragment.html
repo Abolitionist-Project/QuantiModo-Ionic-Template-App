@@ -3,7 +3,9 @@
          style="background-color: #2E294E; padding-left: 0; padding-right: 0">
     <span style="position: absolute; top: 15px; left: 15px; font-size: 36px; max-width: 40px; max-height: 40px; width: 100%; border-radius: 4px;">
         <i ng-if="helpCard.icon" class="icon balanced {{helpCard.icon}}"></i>
-        <img style="max-width: 40px; max-height: 40px;" ng-if="helpCard.image.url" ng-src="{{helpCard.image.url}}">
+        <img style="max-width: 40px; max-height: 40px;"
+             ng-if="helpCard.image.url"
+             ng-src="{{helpCard.image.url}}">
     </span>
         <span style="text-align: center; height: 40px; line-height: 40px; white-space: nowrap; font-family: 'Open Sans', sans-serif;">
             <p ng-if="!platform.isMobile" style="font-size: 24px; color: white; ">{{helpCard.title}}</p>

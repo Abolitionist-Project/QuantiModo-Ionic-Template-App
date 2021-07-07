@@ -28,7 +28,48 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
             numberOfDisplayedNotifications: 0,
             favoritesTitle: "Your Favorites",
             studiesResponse: null,
-            title: "Inbox"
+            title: "Inbox",
+            caughtUpCard: {
+                "id": "importDataPage",
+                "title": "All Caught Up!",
+                "color": {
+                    "backgroundColor": "#f09402",
+                    "circleColor": "#fab952"
+                },
+                "image": {
+                    "url": "https://lh3.googleusercontent.com/pw/AM-JKLWOJ1Mj_5QbVOciDBFTYFLlZ-MYEUfECRTZ2PLBQbwyI-Ct28t9Mqv4mPa6FcgYsD2yBLD9I21CSoG5GatCBaugNh9BlyM5ALX1-qvu8rydGNnJTaaDcOxPV1HPCrdSGtg5aifZI_SXzAScJ9ro6YN1hw=s512-no?authuser=0"
+                },
+                "premiumFeature": true,
+                "bodyText": "Great Job!",
+                "nextPageButtonText": "Maybe Later",
+                "buttons": [{
+                    "id": "reminderButton",
+                    "buttonText": "Add a Reminder",
+                    "buttonClass": "button button-clear button-positive ion-bell",
+                    "goToState": "app.reminderSearch"
+                },{
+                    "id": "measurementButton",
+                    "buttonText": "Record a measurement",
+                    "buttonClass": "button button-clear button-positive ion-edit",
+                    "goToState": "app.measurementSearch"
+                },{
+                    "id": "importButton",
+                    "buttonText": "Import Your Data",
+                    "buttonClass": "button button-clear button-positive ion-checkmark",
+                    "goToState": "app.import"
+                },{
+                    "id": "studiesButton",
+                    "buttonText": "Discoveries",
+                    "buttonClass": "button button-clear button-positive ion-book",
+                    "goToState": "app.studies"
+                },{
+                    "id": "chartsButton",
+                    "buttonText": "Charts",
+                    "buttonClass": "button button-clear button-positive ion-chart",
+                    "goToState": "app.charts"
+                }],
+                "$$hashKey": "object:1200"
+            }
         };
         //createWordCloudFromNotes();
         $scope.$on('$ionicView.beforeEnter', function(e){
@@ -54,7 +95,7 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
             qmService.rootScope.setProperty('bloodPressure', {displayTotal: "Blood Pressure"});
             $scope.stateParams = $stateParams;
             qmService.actionSheet.setDefaultActionSheet(function(){
-                    $scope.syncNotifications();
+                    $scope.syncNotifications({}, "action button clicked");
                 }, getVariableCategoryName());
             qmService.splash.hideSplashScreen();
         });
@@ -62,12 +103,12 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
             qmLog.info('RemindersInboxCtrl afterEnter: ' + window.location.href);
             setPageTitle(); // Setting title afterEnter doesn't fix cutoff on Android
             if(needToRefresh()){
-                $scope.syncNotifications();
+                $scope.syncNotifications({}, '$ionicView.afterEnter and needToRefresh()');
             }
             if($rootScope.platform.isWeb){
                 qm.webNotifications.registerServiceWorker();
             }
-            autoRefresh();
+            scheduleAutoRefresh();
         });
         $scope.$on('$ionicView.beforeLeave', function(){
             qmLog.debug('RemindersInboxCtrl beforeLeave');
@@ -96,13 +137,16 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
             if(qm.notifications.mostRecentNotificationIsOlderThanMostFrequentInterval()){return true;}
             return false;
         }
-        function autoRefresh(){
+        function scheduleAutoRefresh(){
+            var minutes = 30;
+            qmLog.debug("Scheduling auto-refresh every "+minutes+" minutes")
             $timeout(function(){
                 if($state.current.name.toLowerCase().indexOf('inbox') !== -1){
-                    $scope.syncNotifications();
-                    autoRefresh();
+                    qmLog.debug("Auto-refreshing because "+minutes+" minutes has passed and we're in the inbox")
+                    $scope.syncNotifications('autoRefresh');
+                    scheduleAutoRefresh();
                 }
-            }, 30 * 60 * 1000);
+            }, minutes * 60 * 1000);
         }
         var setPageTitle = function(){
             if(getVariableCategoryName() === 'Treatments'){
@@ -140,7 +184,7 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
                 if(moreNotificationsInStorage()){
                     addLocalNotificationsToScope('refreshIfRunningOutOfNotifications');
                 }else{
-                    $scope.syncNotifications();
+                    $scope.syncNotifications('refreshIfRunningOutOfNotifications said getNumberOfDisplayedNotifications < 2 and !moreNotificationsInStorage');
                 }
             }
         }
@@ -231,7 +275,7 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
         }
         var closeWindowIfNecessary = function(){
             if($state.current.name === "app.remindersInboxCompact" && !getNumberOfDisplayedNotifications()){
-                $scope.syncNotifications();
+                $scope.syncNotifications('closeWindowIfNecessary and !getNumberOfDisplayedNotifications()');
                 window.close();
             }
         };
