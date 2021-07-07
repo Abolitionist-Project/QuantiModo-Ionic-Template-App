@@ -408,15 +408,15 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                         qmService.showMaterialAlert("Barcode scan failed!", "Couldn't identify your barcode, but I'll look into it.  Please try a manual search in the meantime. ");
                     }, scannerConfig);
                 },
-                addUpcToVariableObject: function(variableObject){
-                    if(!variableObject){
+                addUpcToVariableObject: function(v){
+                    if(!v){
                         return;
                     }
                     if(qmService.barcodeScanner.upcToAttach){
-                        variableObject.upc = qmService.barcodeScanner.upcToAttach;
+                        v.upc = qmService.barcodeScanner.upcToAttach;
                         qmService.barcodeScanner.upcToAttach = null;
                     }
-                    return variableObject;
+                    return v;
                 },
                 quaggaScan: function(){
                     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
@@ -2267,6 +2267,7 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                     self.finish = function(){
                         self.items = null;
                         $scope.variable = qmService.barcodeScanner.addUpcToVariableObject($scope.variable);
+                        qm.variablesHelper.validateVariables($scope.variable);
                         $mdDialog.hide($scope.variable);
                     };
                     self.scanBarcode = function(deferred){
@@ -2440,6 +2441,7 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                             item.variable.barcode = item.variable.upc = self.barcode;
                             item.variable.barcodeFormat = self.barcodeFormat;
                         }
+                        qm.variablesHelper.validateVariables(item.variable)
                         $scope.variable = item.variable;
                         item.variable.lastSelectedAt = qm.timeHelper.getUnixTimestampInSeconds();
                         qm.variablesHelper.setLastSelectedAtAndSave(item.variable);
@@ -2973,11 +2975,9 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                     var hasMeasurementsOrIsAdmin = hasMeasurements || (u && u.administrator);
                     if(hasMeasurementsOrIsAdmin){buttons.push(allButtons.variableSettings);}
                     if(v){buttons.push(allButtons.compare);}
-                    if(v && v.outcome){
-                        buttons.push(allButtons.predictors);
-                    }else{
-                        buttons.push(allButtons.outcomes);
-                    }
+                    qm.variablesHelper.validateVariables(v);
+                    if(v && v.outcome){buttons.push(allButtons.predictors);}
+                    if(v && v.predictor){buttons.push(allButtons.outcomes);}
                     var actions = v.actionArray;
                     if(actions){
                         for(var i = 0; i < actions.length; i++){
@@ -2987,7 +2987,11 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                             var ionIcon = item.ionIcon || ionIcons.recordMeasurement;
                             qmLog.debug("Action array item: ", item);
                             if(item.action === "track"){
-                                buttons.push({action: item, id: id, text: '<span id="' + id + '"><i class="icon ' + ionIcon + '"></i>' + text + '</span>'});
+                                buttons.push({
+                                    action: item,
+                                    id: id,
+                                    text: '<span id="' + id + '"><i class="icon ' + ionIcon + '"></i>' + text + '</span>'
+                                });
                             }
                             if(buttons.length > 8){break;}
                         }
