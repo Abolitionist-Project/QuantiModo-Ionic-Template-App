@@ -68,14 +68,14 @@ function writeStaticDataFile() {
         ' else if(typeof qm !== "undefined"){qm.staticData = staticData;} else {module.exports = staticData;} ' +
         'if(typeof qm !== "undefined"){qm.stateNames = staticData.stateNames;}'
     try {
-        fileHelper.writeToFile(env.paths.www.staticData, content)
+        fileHelper.writeToFile(env.paths.www.appSettings, content)
     } catch(e) {
         qmLog.error(e.message + ".  Maybe www/data doesn't exist but it might be resolved when we copy from src")
     }
     try {
-        fileHelper.writeToFile("build/chrome_extension/data/qmStaticData.js", content)
+        fileHelper.writeToFile("build/chrome_extension/data/appSettings.js", content)
     } catch(e) {
         qmLog.error(e.message + ".  Maybe build/chrome_extension/data doesn't exist but it might be resolved when we copy from src")
     }
-    return fileHelper.writeToFile(env.paths.src.staticData, content)
+    return fileHelper.writeToFile(env.paths.src.appSettings, content)
 }

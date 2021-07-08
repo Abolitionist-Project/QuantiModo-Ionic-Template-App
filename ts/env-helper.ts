@@ -29,22 +29,22 @@ export let paths = {
     chcpLogin: ".chcplogin",
     sass: ["./src/scss/**/*.scss"],
     src: {
+        appSettings: "src/data/appSettings.js",
         defaultPrivateConfig: "src/default.private_config.json",
         devCredentials: "src/dev-credentials.json",
         firebase: "src/lib/firebase/**/*",
         icons: "src/img/icons",
         js: "src/js/*.js",
         serviceWorker: "src/firebase-messaging-sw.js",
-        staticData: "src/data/qmStaticData.js",
     },
     www: {
+        appSettings: "src/data/appSettings.js",
         defaultPrivateConfig: "www/default.private_config.json",
         devCredentials: "www/dev-credentials.json",
         firebase: "www/lib/firebase/",
         icons: "www/img/icons",
         js: "www/js/",
         scripts: "www/scripts",
-        staticData: "src/data/qmStaticData.js",
     },
 }
 

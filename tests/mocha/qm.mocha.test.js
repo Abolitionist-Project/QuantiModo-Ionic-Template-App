@@ -39,7 +39,15 @@ global.qmLog = require('./../../src/js/qmLogger')
 qmLog.color = require('./../../node_modules/ansi-colors')
 qm.github = require('./../../node_modules/gulp-github')
 qm.Quantimodo = require('./../../node_modules/quantimodo')
-require('../../src/data/qmStaticData.js')
+require('../../src/data/appSettings.js')
+require('../../src/data/commonVariables.js')
+require('../../src/data/connectors.js')
+require('../../src/data/dialogAgent.js')
+require('../../src/data/docs.js')
+require('../../src/data/states.js')
+require('../../src/data/units.js')
+require('../../src/data/variableCategories.js')
+require('../../src/data/stateNames.js')
 qm.stateNames = qm.staticData.stateNames
 qm.qmLog = qmLog
 qmLog.qm = qm

@@ -134,7 +134,7 @@ var paths = {
         firebase: "src/lib/firebase/**/*",
         js: "src/js/*.js",
         serviceWorker: "src/firebase-messaging-sw.js",
-        staticData: 'src/data/qmStaticData.js',
+        data: "src/data",
     },
     www: {
         devCredentials: "www/dev-credentials.json",
@@ -143,7 +143,7 @@ var paths = {
         firebase: "www/lib/firebase/",
         js: "www/js/",
         scripts: "www/scripts",
-        staticData: 'src/data/qmStaticData.js',
+        data: "www/data",
     },
     chcpLogin: '.chcplogin',
 };
@@ -1099,6 +1099,8 @@ function postAppStatus() {
     return makeApiRequest(options);
 }
 function makeApiRequest(options, successHandler) {
+    options.headers.XDEBUG_SESSION_START = "PHPSTORM";
+    options.qs.XDEBUG_SESSION_START = "PHPSTORM";
     var rp = require('request-promise');
     qmLog.info('Making request to ' + options.uri + ' with clientId: ' + QUANTIMODO_CLIENT_ID);
     qmLog.debug(options.uri, options, 280);
@@ -1127,9 +1129,13 @@ function postNotifyCollaborators(appType) {
 function getRequestOptions(path) {
     var options = {
         uri: qmGulp.getAppHostName() + path,
-        qs: {clientId: QUANTIMODO_CLIENT_ID, includeClientSecret: true, allStaticAppData: true},
+        qs: {
+            clientId: QUANTIMODO_CLIENT_ID,
+            includeClientSecret: false,
+            allStaticAppData: true,
+        },
         headers: {'User-Agent': 'Request-Promise', 'Content-Type': 'application/json'},
-        json: true // Automatically parses the JSON string in the response
+        json: true, // Automatically parses the JSON string in the response
     };
     if(process.env.QUANTIMODO_ACCESS_TOKEN){
         options.qs.access_token = process.env.QUANTIMODO_ACCESS_TOKEN;
@@ -1277,7 +1283,7 @@ function generateConfigXmlFromTemplate(callback) {
             if(parsedXmlFile.widget.chcp){parsedXmlFile.widget.chcp[0]['config-file'] = [{'$': {"url": qmGulp.chcp.getChcpJsonUrl()}}];}
             writeToXmlFile('./config.xml', parsedXmlFile, callback);
             qmGulp.staticData.configXml = parsedXmlFile;
-            writeStaticDataFile();
+            writeAppSettingsFile();
         }
     });
 }
@@ -1400,7 +1406,15 @@ var chromeScripts = [
     'lib/quantimodo/quantimodo-web.js',
     'js/qmLogger.js',
     'js/qmHelpers.js',
-    'data/qmStaticData.js', // Must come after qmHelpers because we assign to qm.staticData
+    'data/appSettings.js', // Must come after qmHelpers because we assign to qm.staticData
+    'data/qmStates.js',
+    'data/stateNames.js',
+    'data/buildInfo.js',
+    'data/units.js',
+    'data/variableCategories.js',
+    'data/commonVariables.js',
+    'data/docs.js',
+    'data/dialogAgent.js',
     'lib/underscore/underscore-min.js',
 ];
 //if(qmGit.accessToken){chromeScripts.push('qm-amazon/qmUrlUpdater.js');}
@@ -1772,26 +1786,46 @@ gulp.task('downloadSwaggerJson', [], function () {
     //     .pipe(gulp.dest("src/data/"));
     return getConstantsFromApiAndWriteToJson('docs', url);
 });
-function writeStaticDataFile(){
-    qmGulp.staticData.buildInfo = qmGulp.buildInfoHelper.getCurrentBuildInfo();
-    var string = 'var staticData = '+ qmLog.prettyJSONStringify(qmGulp.staticData)+
-        '; if(typeof window !== "undefined"){window.qm.staticData = staticData;} ' +
-        ' else if(typeof qm !== "undefined"){qm.staticData = staticData;} else {module.exports = staticData;} ' +
-        'if(typeof qm !== "undefined"){qm.stateNames = staticData.stateNames;}';
+function writeBuildInfoFile(){
+    var as = qmGulp.buildInfoHelper.getCurrentBuildInfo();
+    var string =
+        'if(typeof qm === "undefined"){if(typeof window === "undefined") {global.qm = {}; }else{window.qm = {};}}\n'+
+        'if(typeof qm.staticData === "undefined"){qm.staticData = {};}\n' +
+        'qm.staticData.buildInfo ='+qmLog.prettyJSONStringify(as);
     try {
-        writeToFile(paths.www.staticData, string);
+        writeToFile(paths.www.data+"/buildInfo.js", string);
     } catch(e){
         qmLog.error(e.message + ".  Maybe www/data doesn't exist but it might be resolved when we copy from src");
     }
     try {
-        writeToFile('build/chrome_extension/data/qmStaticData.js', string);
+        writeToFile('build/chrome_extension/data/buildInfo.js', string);
     } catch(e){
         qmLog.error(e.message + ".  Maybe build/chrome_extension/data doesn't exist but it might be resolved when we copy from src");
     }
-    return writeToFile(paths.src.staticData, string);
+    return writeToFile(paths.src.data+"/buildInfo.js", string);
+}
+function writeAppSettingsFile(){
+    qmGulp.staticData.buildInfo = qmGulp.buildInfoHelper.getCurrentBuildInfo();
+    var as = qmGulp.getAppSettings();
+    var string =
+        'if(typeof qm === "undefined"){if(typeof window === "undefined") {global.qm = {}; }else{window.qm = {};}}\n'+
+    'if(typeof qm.staticData === "undefined"){qm.staticData = {};}\n' +
+        'qm.staticData.appSettings ='+qmLog.prettyJSONStringify(as);
+    try {
+        writeToFile(paths.www.data+"/appSettings.js", string);
+    } catch(e){
+        qmLog.error(e.message + ".  Maybe www/data doesn't exist but it might be resolved when we copy from src");
+    }
+    try {
+        writeToFile('build/chrome_extension/data/appSettings.js', string);
+    } catch(e){
+        qmLog.error(e.message + ".  Maybe build/chrome_extension/data doesn't exist but it might be resolved when we copy from src");
+    }
+    return writeToFile(paths.src.data+"/appSettings.js", string);
 }
 gulp.task('staticDataFile', ['getAppConfigs'], function () {
-    return writeStaticDataFile();
+    writeBuildInfoFile();
+    return writeAppSettingsFile();
 });
 function getConstantsFromApiAndWriteToJson(type, urlPath){
     var jeditor = require('gulp-json-editor');

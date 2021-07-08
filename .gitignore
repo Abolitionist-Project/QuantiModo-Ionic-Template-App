@@ -51,7 +51,6 @@ supply_json_key_for_google_play.json
 src/configuration-index.html
 src/configuration/
 #*.css
-src/data/*.json
 src/img/CS6.zip
 src/img/icons/*
 !src/img/icons/.gitkeep
@@ -86,7 +85,6 @@ src/index.html
 src/custom-lib/quantimodo/
 .DS_Store
 .io-config.json
-src/data/units\.json
 ghostinspector\.json
 ngrok*
 gradlew
@@ -120,7 +118,6 @@ yarn-error\.log
 GoogleService-Info.plist
 google-services.json
 !/src/css/study.css
-src/data/qmStaticData.js
 src/data/apiai/
 /lastCommitBuilt
 src/data/commits/
@@ -149,3 +146,5 @@ ts/**/*.js
 ts/**/*.map
 cypress/**/*.js
 cypress/**/*.map
+/src/data/qmStaticData.js
+/src/data/buildInfo.js

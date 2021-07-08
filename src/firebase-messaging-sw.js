@@ -17,7 +17,15 @@ importScripts(libUrl+'q/q.js');
 //importScripts(libUrl+'bugsnag/dist/bugsnag.min.js');
 importScripts(getIonicAppBaseUrl()+'js/qmLogger.js');
 importScripts(getIonicAppBaseUrl()+'js/qmHelpers.js');
-importScripts(getIonicAppBaseUrl()+'data/qmStaticData.js');
+importScripts(getIonicAppBaseUrl()+'data/appSettings.js');
+importScripts(getIonicAppBaseUrl()+'data/qmStates.js');
+importScripts(getIonicAppBaseUrl()+'data/stateNames.js');
+importScripts(getIonicAppBaseUrl()+'data/buildInfo.js');
+importScripts(getIonicAppBaseUrl()+'data/units.js');
+importScripts(getIonicAppBaseUrl()+'data/variableCategories.js');
+importScripts(getIonicAppBaseUrl()+'data/commonVariables.js');
+importScripts(getIonicAppBaseUrl()+'data/docs.js');
+importScripts(getIonicAppBaseUrl()+'data/dialogAgent.js');
 var config = {
     apiKey: "AIzaSyAro7_WyPa9ymH5znQ6RQRU2CW5K46XaTg",
     authDomain: "quantimo-do.firebaseapp.com",

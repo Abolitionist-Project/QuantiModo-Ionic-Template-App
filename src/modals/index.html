@@ -12,7 +12,15 @@
     <script src="../js/ionIcons.js"></script>
     <script src="../js/qmLogger.js"></script>
     <script src="../js/qmHelpers.js"></script>
-    <script src="../data/qmStaticData.js"></script>
+    <script src="../data/appSettings.js"></script> <!-- Must come after qmHelpers because we assign to qm.staticData -->
+    <script src="../data/qmStates.js"></script>
+    <script src="../data/stateNames.js"></script>
+    <script src="../data/buildInfo.js"></script>
+    <script defer src="../data/units.js"></script>
+    <script defer src="../data/variableCategories.js"></script>
+    <script defer src="../data/commonVariables.js"></script>
+    <script defer src="../data/docs.js"></script>
+    <script defer src="../data/dialogAgent.js"></script>
 </head>
 <body>
     <button id="popup-button">Popup</button>
