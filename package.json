@@ -120,7 +120,7 @@
     "event-stream": "4.0.1",
     "express": "4.17.1",
     "gulp": "3.9.1",
-    "gulp-angular-templatecache": "2.2.7",
+    "gulp-angular-templatecache": "3.0.0",
     "gulp-change": "1.0.2",
     "gulp-concat": "2.6.1",
     "gulp-csso": "3.0.1",
