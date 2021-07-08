@@ -100,7 +100,7 @@
     "@types/mocha": "8.2.2",
     "@types/node": "10.17.56",
     "@types/node-fetch": "2.5.10",
-    "@types/q": "1.5.4",
+    "@types/q": "1.5.5",
     "@types/remote-origin-url": "2.0.0",
     "@types/rimraf": "2.0.5",
     "@types/underscore.string": "0.0.38",
