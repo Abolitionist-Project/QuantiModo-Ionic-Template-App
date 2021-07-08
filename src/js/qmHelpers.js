@@ -3,6 +3,8 @@
 /** @namespace qm.chrome */
 /* global AppSettings TweenMax, Power1, Sine, Linear, Power3, TimelineMax, Power2 */
 /* eslint-env browser */
+import * as qmLog from "../../ts/qm.log";
+
 String.prototype.toCamelCase = function(){
     return this.replace(/(\_[a-z])/g, function($1){
         return $1.toUpperCase().replace('_', '');
@@ -4188,7 +4190,7 @@ var qm = {
             if(!stringContents){
                 throw filePath + " stringContents not provided to writeToFileWithCallback";
             }
-            qmLog.info("Writing to " + filePath);
+            qmLog.debug("Writing to " + filePath);
             if(typeof stringContents !== "string"){
                 stringContents = JSON.stringify(stringContents);
             }
@@ -4203,7 +4205,7 @@ var qm = {
             return rimraf(filesArray, cb);
         },
         writeFileSync: function(filePath, stringContents){
-            qmLog.info("Writing to " + filePath);
+            qmLog.debug("Writing to " + filePath);
             if(typeof stringContents !== "string"){
                 stringContents = qm.stringHelper.prettyJSONStringify(stringContents);
             }

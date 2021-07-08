@@ -146,13 +146,13 @@ export function writeToFile(filePath: string, contents: any) {
 
     const absolutePath = getAbsolutePath(filePath)
     ensureDirectoryExistence(absolutePath)
-    console.log("Writing to " + absolutePath)
+    qmLog.debug("Writing to " + absolutePath)
     fs.writeFile(absolutePath, contents, (err) => {
         if (err) {
             deferred.reject(err)
         }
         // tslint:disable-next-line:no-console
-        console.log(absolutePath + "\n\tsaved!")
+        qmLog.debug(absolutePath + "\n\tsaved!")
         deferred.resolve(absolutePath)
     })
     return deferred.promise

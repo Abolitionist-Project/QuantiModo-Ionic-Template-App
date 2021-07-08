@@ -229,7 +229,7 @@ var qmLog = {
         if(!stringContents || stringContents === "undefined" || stringContents === "null"){
             throw "String contents are " + stringContents;
         }
-        qmLog.info("Writing to " + filePath);
+        qmLog.debug("Writing to " + filePath);
         if(typeof stringContents !== "string"){stringContents = qmLog.prettyJSONStringify(stringContents);}
         return fs.writeFileSync(filePath, stringContents);
     }

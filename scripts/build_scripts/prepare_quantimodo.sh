@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-
+set +x
+set -e
 export RED='\033[0;31m'
 export GREEN='\033[0;32m'
 export NC='\033[0m' # No Color
 
 PARENT_SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-SCRIPT_FOLDER=`dirname ${PARENT_SCRIPT_PATH}`
+SCRIPT_FOLDER=$(dirname "${PARENT_SCRIPT_PATH}")
 echo "SCRIPT_FOLDER is $SCRIPT_FOLDER"
-cd ${SCRIPT_FOLDER}
+cd "${SCRIPT_FOLDER}"
 cd ../..
-export IONIC_PATH="$PWD"
+# shellcheck source=./../log_start.sh
+export IONIC_PATH="$PWD" && source "${IONIC_PATH}"/scripts/log_start.sh
 
 echo "IONIC_PATH is $IONIC_PATH"
 export INTERMEDIATE_PATH="$IONIC_PATH"
@@ -55,3 +57,6 @@ echo "Cannot use exclamation point in app description"
 
 source ${INTERMEDIATE_PATH}/scripts/build_scripts/01_prepare_project.sh
 ionic resources ios
+
+# shellcheck source=./../log_end.sh
+source "$IONIC_PATH"/scripts/log_end.sh "${BASH_SOURCE[0]}"

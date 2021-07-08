@@ -1,4 +1,5 @@
 #!/bin/bash
+set +x
 if [[ $EUID -eq 0 ]]; then
     echo
     echo "================ Error ================="
