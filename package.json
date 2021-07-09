@@ -181,7 +181,7 @@
     "sweetalert2": "10.16.9",
     "taco-team-build": "0.2.5",
     "time-require": "0.1.2",
-    "ts-node": "10.0.0",
+    "ts-node": "10.1.0",
     "typescript": "3.9.10",
     "vinyl-source-stream": "2.0.0",
     "xcode": "3.0.1",
