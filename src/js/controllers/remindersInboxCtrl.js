@@ -444,8 +444,6 @@ angular.module('starter').controller('RemindersInboxCtrl', ["$scope", "$state", 
             qmLog.info("Editing "+JSON.stringify(trackingReminder));
             qmService.goToState('app.reminderAdd', {
                 reminder: trackingReminder,
-                fromUrl: window.location.href,
-                fromState: $state.current.name
             });
         };
         // Triggered on a button click, or some other target

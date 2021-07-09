@@ -206,8 +206,7 @@ angular.module('starter').controller('historyAllMeasurementsCtrl', ["$scope", "$
         $scope.editMeasurement = function(measurement){
             //measurement.hide = true;  // Hiding when we go to edit so we don't see the old value when we come back
             qmService.goToState('app.measurementAdd', {
-                measurement: measurement, fromState: $state.current.name,
-                fromUrl: window.location.href
+                measurement: measurement,
             });
         };
         $scope.refreshHistory = function(){

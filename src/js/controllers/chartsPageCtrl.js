@@ -109,7 +109,6 @@ angular.module('starter').controller('ChartsPageCtrl', ["$scope", "$q", "$state"
             qmLog.debug('addNewReminderButtonClick', null);
             qmService.goToState('app.reminderAdd', {
                 variableObject: $scope.state.variableObject,
-                fromState: $state.current.name
             });
         };
         $scope.compareButtonClick = function(){
@@ -120,7 +119,6 @@ angular.module('starter').controller('ChartsPageCtrl', ["$scope", "$q", "$state"
             qmLog.info("Going to record measurement for " + JSON.stringify($scope.state.variableObject));
             qmService.goToState(qm.staticData.stateNames.measurementAdd, {
                 variableObject: $scope.state.variableObject,
-                fromState: $state.current.name
             });
         };
         $scope.editSettingsButtonClick = function(){

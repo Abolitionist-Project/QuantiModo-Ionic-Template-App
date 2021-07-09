@@ -339,8 +339,6 @@ angular.module('starter').controller('MeasurementAddCtrl', [
         $scope.goToAddReminder = function(){
             qmService.goToState('app.reminderAdd', {
                 variableObject: $scope.state.variableObject,
-                fromState: $state.current.name,
-                fromUrl: window.location.href,
                 measurement: $stateParams.measurement
             });
         };

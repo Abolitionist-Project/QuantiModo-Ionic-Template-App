@@ -304,7 +304,7 @@ angular.module('starter')// Parent Controller - This controller runs before ever
                         qmLog.debug('BUTTON CLICKED', null, i);
                         if(i === 0){qmService.goToState('app.reminderAdd', {reminder: favorite});}
                         if(i === 1){qmService.goToState('app.measurementAdd', {trackingReminder: favorite});}
-                        if(i === 2){qmService.goToState('app.charts', {trackingReminder: favorite, fromState: $state.current.name,});}
+                        if(i === 2){qmService.goToState('app.charts', {trackingReminder: favorite,});}
                         if(i === 3){qmService.goToState('app.historyAllVariable', {variableObject: variableObject});}
                         if(i === 4){qmService.goToVariableSettingsByName(favorite.variableName);}
                         return true;

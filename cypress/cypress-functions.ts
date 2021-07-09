@@ -131,13 +131,15 @@ function copyCypressEnvConfigIfNecessary() {
     }
     console.info("Cypress Configuration: " + cypressJsonString)
 }
-function setGithubStatusAndUploadTestResults(failedTests: any[] | null, context: string, cb: (err: any) => void) {
-    // @ts-ignore
+function setGithubStatusAndUploadTestResults(failedTests: any[], context: string, cb: (err: any) => void) {
+    const test = failedTests[0];
     const failedTestTitle = failedTests[0].title[1]
-    // @ts-ignore
-    const errorMessage = failedTests[0].error
-    qmGit.setGithubStatus("failure", context, failedTestTitle + ": " +
-        errorMessage, getReportUrl(), function() {
+    const errorMessage = test.displayError
+    if(!failedTests[0].displayError || failedTests[0].displayError === "undefined"){
+        qmLog.le("No displayError on failedTests[0]: ", failedTests[0])
+    }
+    qmGit.setGithubStatus("failure", context, failedTestTitle + " err: " +
+        failedTests[0].error, getReportUrl(), function() {
         uploadMochawesome().then(function(urls) {
             console.error(errorMessage)
             cb(errorMessage)
@@ -348,6 +350,12 @@ export function runCypressTestsInParallel(cb?: (err: any) => void) {
     })
 }
 
+function moveToFront(specFileNames: string[], first: string) {
+    specFileNames.sort(function (x, y) {
+        return x == first ? -1 : y == first ? 1 : 0;
+    });
+}
+
 export function runCypressTests(cb?: (err: any) => void) {
     qmLog.logStartOfProcess("runCypressTests")
     deleteSuccessFile()
@@ -364,6 +372,8 @@ export function runCypressTests(cb?: (err: any) => void) {
             if (!specFileNames) {
                 throw new Error("No specFileNames in " + specsPath)
             }
+            moveToFront(specFileNames, "ionic_measurements_spec.js") // Fails a lot
+            moveToFront(specFileNames, "ionic_variables_spec.js") // Fails a lot
             for (let i = 0, p = Promise.resolve(); i < specFileNames.length; i++) {
                 const specName = specFileNames[i]
                 if (releaseStage === "ionic" && specName.indexOf("ionic_") === -1) {

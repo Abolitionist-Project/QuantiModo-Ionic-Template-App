@@ -4,6 +4,15 @@ import qm from "../src/js/qmHelpers.js"
 import {envs, getenv, getenvOrException, getQMClientIdIfSet, qmPlatform} from "./env-helper"
 import {getBuildLink, getCiProvider} from "./test-helpers"
 
+export function le(s: string, meta: any) {
+    s = obfuscateString(s)
+    if(meta) {
+        meta = obfuscateSecrets(meta)
+        s += prettyJSONStringify(meta)
+    }
+    throw Error(s)
+}
+
 // tslint:disable-next-line:max-line-length
 function isTruthy(value: any) {
     return (value && value !== "false")

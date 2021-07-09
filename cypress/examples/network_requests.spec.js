@@ -155,7 +155,7 @@ context('Network Requests', () => {
       })
   })
 
-  it('cy.route() - route responses to matching requests', () => {
+  it('cy.intercept() - route responses to matching requests', () => {
     // https://on.cypress.io/route
 
     let message = 'whoa, this comment does not exist'
@@ -163,7 +163,7 @@ context('Network Requests', () => {
     cy.server()
 
     // Listen to GET to comments/1
-    cy.route('GET', 'comments/*').as('getComment')
+    cy.intercept('GET', 'comments/*').as('getComment')
 
     // we have code that gets a comment when
     // the button is clicked in scripts.js
@@ -173,7 +173,7 @@ context('Network Requests', () => {
     cy.wait('@getComment').its('status').should('eq', 200)
 
     // Listen to POST to comments
-    cy.route('POST', '/comments').as('postComment')
+    cy.intercept('POST', '/comments').as('postComment')
 
     // we have code that posts a comment when
     // the button is clicked in scripts.js
@@ -181,11 +181,11 @@ context('Network Requests', () => {
     cy.wait('@postComment').should((xhr) => {
       expect(xhr.requestBody).to.include('email')
       expect(xhr.requestHeaders).to.have.property('Content-Type')
-      expect(xhr.responseBody).to.have.property('name', 'Using POST in cy.route()')
+      expect(xhr.responseBody).to.have.property('name', 'Using POST in cy.intercept()')
     })
 
     // Stub a response to PUT comments/ ****
-    cy.route({
+    cy.intercept({
       method: 'PUT',
       url: 'comments/*',
       status: 404,

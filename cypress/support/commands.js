@@ -103,14 +103,10 @@ Cypress.Commands.add('visitWithApiUrlParam', (url, options = {}) => {
     cy.visit(url, options)
 })
 // noinspection JSUnusedLocalSymbols
-Cypress.Commands.add('visitApi', (url, options = {}, urlParams = {}) => {
-    cy.log(`=== visitWithApiUrlParam at ${url} ===`)
-    if(!API_HOST || API_HOST === 'undefined'){
-        throw 'Please set API_HOST env!'
-    }
-    if(!options.qs){
-        options.qs = {}
-    }
+Cypress.Commands.add('visitApi', (url, options = {}) => {
+    cy.log(`=== visitApi at ${url} ===`)
+    if(!API_HOST || API_HOST === 'undefined'){ throw 'Please set API_HOST env!' }
+    if(!options.qs){ options.qs = {} }
     options.qs.XDEBUG_SESSION_START = 'PHPSTORM'
     cy.visit("https://" + API_HOST + url, options)
 })
@@ -201,7 +197,7 @@ Cypress.Commands.add('enterNewUserCredentials', (clickAccept) => {
     cy.get('input[name="user_pass"]').click({force: true}).type('qwerty', {force: true})
     cy.get('input[name="user_pass_confirmation"]').click({force: true}).type('qwerty', {force: true})
     cy.get('input[type="submit"]').click({force: true})
-    if(clickAccept && oauthAppBaseUrl.indexOf("quantimo.do") === -1){
+    if(clickAccept && baseUrl.indexOf("quantimo.do") === -1){
         cy.log("OAUTH_APP_HOST is external so we have to click approve on oauth page")
         cy.get('#button-approve').click({force: true})
     }

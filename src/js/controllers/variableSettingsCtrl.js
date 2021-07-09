@@ -96,7 +96,6 @@ angular.module('starter').controller('VariableSettingsCtrl', ["$scope", "$state"
                         }
                         if(index === 4){
                             qmService.goToState('app.tagSearch', {
-                                fromState: $state.current.name,
                                 userTaggedVariableObject: uv
                             });
                         }

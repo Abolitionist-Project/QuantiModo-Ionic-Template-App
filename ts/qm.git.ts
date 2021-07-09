@@ -99,8 +99,14 @@ export const githubStatusStates = {
 export function setGithubStatus(testState: "error" | "failure" | "pending" | "success", context: string,
                                 description: string, url?: string | null, cb?: ((arg0: any) => void) | undefined) {
     if(testState === "pending") {qmLog.logStartOfProcess(context)}
-    if (testState === "error") {qmLog.error(description + " " + context)}
-    qmLog.info("Setting status on Github: "+ description + " " + context)
+    const message1 = "Setting status on Github: "+ testState +
+        "\n\tdescription: "+ description +
+        "\n\tcontext: " + context
+    if (testState === "error") {
+        qmLog.error(message1)
+    } else {
+        qmLog.info(message1)
+    }
     description = _str.truncate(description, 135)
     url = url || getBuildLink()
     if(!url) {

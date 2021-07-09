@@ -1858,14 +1858,12 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                     });
                     //$timeout(function() {hideSheetForNotification();}, 20000);
                 },
-                editReminderSettingsByNotification: function(trackingReminderNotification){
-                    trackingReminderNotification.hide = true;
-                    var trackingReminder = trackingReminderNotification;
-                    trackingReminder.id = trackingReminderNotification.trackingReminderId;
+                editReminderSettingsByNotification: function(notification){
+                    var reminder = JSON.parse(JSON.stringify(notification));
+                    notification.hide = true;
+                    reminder.id = notification.trackingReminderId;
                     qmService.goToState('app.reminderAdd', {
-                        reminder: trackingReminder,
-                        fromUrl: window.location.href,
-                        fromState: $state.current.name
+                        reminder: reminder,
                     });
                 },
                 broadcastGetTrackingReminderNotifications: function(){
@@ -3345,6 +3343,7 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
             if(to !== "false"){
                 params = params || {};
                 params.fromUrl = window.location.href;
+                params.fromState = $state.current.name;
                 params = qm.objectHelper.snakeToCamelCaseProperties(params);
                 qmService.setCurrentState({name: to, params: params})
                 $state.go(to, params, options);
@@ -5821,8 +5820,6 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
                 qmLog.debug('Going to favoriteAdd state', null);
                 qmService.goToState(qm.staticData.stateNames.favoriteAdd, {
                     variableObject: v,
-                    fromState: $state.current.name,
-                    fromUrl: window.location.href,
                     doneState: 'app.favorites'
                 });
                 return;
@@ -5830,8 +5827,6 @@ angular.module('starter').factory('qmService', ["$http", "$q", "$rootScope", "$i
             qm.reminderHelper.addToQueue(tr);
             qmService.goToState(qm.staticData.stateNames.favorites, {
                 trackingReminder: tr,
-                fromState: $state.current.name,
-                fromUrl: window.location.href
             });
             qm.reminderHelper.syncReminders();
         };

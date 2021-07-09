@@ -5444,12 +5444,15 @@ var qm = {
                 qmLog.errorAndExceptionTestingOrDevelopment("No start time provided to delete measurement: ", toDelete);
             }
             qmLog.info("Deleting "+toDelete.variableName+" measurement from "+startAt+"...")
+            qm.measurements.postMeasurementPromise = deferred.promise // Prevents getting measurements before POST completes
             qm.api.post('api/v3/measurements/delete', toDelete, function(response){
                 deferred.resolve(response);
                 qm.measurements.deleteLocally(toDelete);
+                qm.measurements.postMeasurementPromise = null
             }, function(err){
                 deferred.reject(err);
                 qm.measurements.deleteLocally(toDelete);
+                qm.measurements.postMeasurementPromise = null
             });
             return deferred.promise;
         },
@@ -5496,14 +5499,25 @@ var qm = {
             });
         },
         getMeasurementsFromApi: function(params){
+            function getMeasurements() {
+                qm.api.get('api/v3/measurements', [], params, function (measurements) {
+                    qm.measurements.addToCache(measurements)
+                    deferred.resolve(measurements);
+                }, function (err) {
+                    qmLog.error(err);
+                    deferred.reject(err);
+                })
+            }
+            //debugger
             var deferred = Q.defer();
-            qm.api.get('api/v3/measurements', [], params,function(measurements){
-                qm.measurements.addToCache(measurements)
-                deferred.resolve(measurements);
-            }, function(err){
-                qmLog.error(err);
-                deferred.reject(err);
-            })
+            if(qm.measurements.postMeasurementPromise){  // Prevents getting measurements before POST completes
+                qm.measurements.postMeasurementPromise.finally(function(){
+                    //debugger
+                    getMeasurements();
+                })
+            } else {
+                getMeasurements();
+            }
             return deferred.promise;
         },
         addLocationDataToMeasurement: function(m){
@@ -5645,6 +5659,7 @@ var qm = {
             });
             return deferred.promise;
         },
+        postMeasurementPromise: null,
         postMeasurementQueue: function(){
             var deferred = Q.defer();
             var queueObj = qm.measurements.queue;
@@ -5657,6 +5672,7 @@ var qm = {
                     promises.push(qm.measurements.roundMeasurementTime(m))
                 })
                 Q.all(promises).then(function (){
+                    qm.measurements.postMeasurementPromise = deferred.promise // Prevents getting measurements before POST completes
                     qm.measurements.postMeasurements(queueArr)
                         .then(function(data){
                             qm.measurements.queue = {};
@@ -5669,10 +5685,12 @@ var qm = {
                                 })
                             })
                             deferred.resolve(data);
+                            qm.measurements.postMeasurementPromise = null;
                         }, function(error){
                             debugger
                             qm.measurements.queue = queueObj;
                             deferred.reject(error);
+                            qm.measurements.postMeasurementPromise = null;
                         });
                 })
             }

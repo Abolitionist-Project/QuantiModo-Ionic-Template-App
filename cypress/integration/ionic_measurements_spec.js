@@ -3,7 +3,7 @@
 function saveMeasurement() {
     cy.get('#saveButton').click({force: true})
     cy.log('Waiting for measurement to post to API...')
-    cy.wait('@post-measurement', {timeout: 30000}).should('have.property', 'status', 201)
+    cy.wait('@post-measurement', {timeout: 30000}).its('response.statusCode').should('eq', 201)
     cy.log('Waiting for measurement with id to be stored...')
     cy.wait(500)
 }
@@ -67,6 +67,10 @@ function ratingValueToImage(value, valence) {
     return ratingImages[valence][value - 1]
 }
 
+function getTopMeasurementTitle() {
+    return cy.get('#historyItemTitle-0', {timeout: 40000})
+}
+
 /**
  * @param {number} [dosageValue]
  * @param variableName
@@ -93,8 +97,13 @@ function recordTreatmentMeasurementAndCheckHistoryPage(dosageValue, variableName
     saveMeasurement()
     cy.visitIonicAndSetApiUrl('/#/app/history-all-category/' + variableCategory)
     let treatmentStringNoQuotes = `${dosageValue} mg Aaa Test Treatment`
-    cy.get('#historyItemTitle-0', {timeout: 40000})
-        .should('contain', treatmentStringNoQuotes)
+    getTopMeasurementTitle().invoke('text').then((text) => {
+        //debugger
+        if(text.trim() !== treatmentStringNoQuotes){
+            cy.log("ERROR: top value should be " + treatmentStringNoQuotes + " but is " + text.trim())
+        }
+    })
+    getTopMeasurementTitle().should('contain', treatmentStringNoQuotes)
 }
 
 /**
@@ -102,7 +111,7 @@ function recordTreatmentMeasurementAndCheckHistoryPage(dosageValue, variableName
  */
 function editHistoryPageMeasurement(itemTitle) {
     cy.log(`Editing history measurement with title containing: ${itemTitle}`)
-    cy.get('#historyItemTitle-0', {timeout: 30000}).contains(itemTitle)
+    getTopMeasurementTitle().contains(itemTitle)
     cy.get('#action-sheet-button-0', {timeout: 30000}).click({force: true})
     cy.clickActionSheetButtonContaining('Edit')
     cy.wait(2000)
@@ -125,7 +134,7 @@ function deleteMeasurements(variableName) {
                     cy.wrap($el).click({force: true, timeout: 10000})
                     cy.clickActionSheetButtonContaining('Delete')
                     cy.wait('@measurements-delete', {timeout: 30000})
-                        .should('have.property', 'status', 204)
+                        .its('response.statusCode').should('eq', 204)
                     deleted = true
                 })
         }
@@ -139,7 +148,7 @@ function deleteMeasurements(variableName) {
                 cy.wrap($el).click()
                 cy.clickActionSheetButtonContaining('Delete')
                 cy.wait('@measurements-delete', {timeout: 30000})
-                    .should('have.property', 'status', 204)
+                    .its('response.statusCode').should('eq', 204)
                 deleted = true
             } else {
                 // It's a header
@@ -164,8 +173,8 @@ describe('Measurements', function () {
     it('Goes to edit measurement from history page', function () {
         cy.loginWithAccessTokenIfNecessary('/#/app/history-all-category/Anything')
         cy.wait('@measurements', {timeout: 30000})
-            .should('have.property', 'status', 200)
-        cy.get('#historyItemTitle-0', {timeout: 30000}).click({force: true})
+            .its('response.statusCode').should('eq', 200)
+        getTopMeasurementTitle().click({force: true})
         cy.clickActionSheetButtonContaining('Edit')
         cy.wait(2000)
         cy.url().should('include', 'measurement-add')
@@ -178,7 +187,7 @@ describe('Measurements', function () {
         checkChartsPage(variableName)
         goToHistoryForVariable(variableName, true)
         cy.wait('@measurements', {timeout: 30000})
-            .should('have.property', 'status', 200)
+            .its('response.statusCode').should('eq', 200)
         deleteMeasurements(variableName)
         cy.loginWithAccessTokenIfNecessary('/#/app/measurement-add-search')
         cy.searchAndClickTopResult(variableName, true)
@@ -212,7 +221,7 @@ describe('Measurements', function () {
         })
     })
     // Skipping because it fails randomly and can't reproduce failure locally
-    it('Record, edit, and delete a treatment measurement', function () {
+    it.only('Record, edit, and delete a treatment measurement', function () {
         let dosageValue = Math.floor(Math.random() * 100) + 10
         let variableName = 'Aaa Test Treatment'
         let variableCategoryName = 'Treatments'
@@ -228,7 +237,7 @@ describe('Measurements', function () {
         cy.url().should('include', '/#/app/history-all-category/' + variableCategoryName)
         cy.log('Check that deleted measurement is gone (must use does not equal instead of does not contain because a ' +
             'measurement of 0mg will be true if the value is 50mg)')
-        cy.get('#historyItemTitle-0', {timeout: 40000})
+        getTopMeasurementTitle()
             .should('not.contain', `${newDosageValue} mg ` + variableName)
     })
     // Seeing if skip fixes timeout problem

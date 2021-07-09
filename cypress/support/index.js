@@ -129,9 +129,9 @@ Cypress.on('log:added', (options) => {
 
 beforeEach(() => {
     cy.server()
-    cy.route('GET', '/api/v3/measurements*').as('measurements')
-    cy.route('GET', '/api/v3/variables*').as('get-variables')
-    cy.route('POST', '/api/v3/measurements*').as('post-measurement')
-    cy.route('POST', '/api/v3/measurements/delete').as('delete-measurements')
-    cy.route('POST', '/api/v3/trackingReminderNotifications*').as('post-notifications')
+    cy.intercept('GET', '/api/v3/measurements*').as('measurements')
+    cy.intercept('GET', '/api/v3/variables*').as('get-variables')
+    cy.intercept('POST', '/api/v3/measurements*').as('post-measurement')
+    cy.intercept('POST', '/api/v3/measurements/delete').as('delete-measurements')
+    cy.intercept('POST', '/api/v3/trackingReminderNotifications*').as('post-notifications')
 })
