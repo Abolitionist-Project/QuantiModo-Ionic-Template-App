@@ -159,7 +159,7 @@
     "gulp-watch": "5.0.1",
     "gulp-zip": "5.1.0",
     "inquirer": "7.3.3",
-    "ionic": "2.2.3",
+    "ionic": "5.4.16",
     "jshint": "2.13.0",
     "lazypipe": "1.0.2",
     "mime": "2.4.6",
