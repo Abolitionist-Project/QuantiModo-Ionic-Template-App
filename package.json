@@ -19,7 +19,7 @@
     "@slack/types": "1.9.0",
     "@slack/webhook": "5.0.3",
     "angular": "latest",
-    "aws-sdk": "2.941.0",
+    "aws-sdk": "2.947.0",
     "aws-sdk-mock": "4.5.0",
     "beautify": "0.0.8",
     "chai": "4.3.4",
